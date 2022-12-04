@@ -18,7 +18,7 @@
 ## Technologies used
 
 ![CSharp](https://img.shields.io/static/v1?label=&message=csharp&color=blueviolet&logo=csharp&logoColor=white&style=for-the-badge)
-![.NET7.0](https://img.shields.io/static/v1?label=&message=.Net7.0&color=blueviolet&logo=.net&logoColor=white&style=for-the-badge)
+![.NET6.0](https://img.shields.io/static/v1?label=&message=.Net7.0&color=blueviolet&logo=.net&logoColor=white&style=for-the-badge)
 ![SQL](https://img.shields.io/static/v1?label=&message=SQLServer&color=red&logo=sql&logoColor=white&style=for-the-badge)
 ![JQuery](https://img.shields.io/static/v1?label=&message=jquery&color=blue&logo=sql&logoColor=white&style=for-the-badge)
 ![AJAX](https://img.shields.io/static/v1?label=&message=ajax&color=blue&logo=sql&logoColor=white&style=for-the-badge)

@@ -1,0 +1,224 @@
+﻿<div>
+    <div id="Ejemplo3">
+        <h1 class="display-6">AjaxEmployee Index page</h1>
+
+        <form>
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" onclick="getEmployees('div_Loader', 1000)">
+                    Show with AJAX
+                </button>
+                <button type="button" class="btn btn-primary" onclick="postEmployees('div_Loader', 1000)">
+                    Save listArray with AJAX
+                </button>
+                <button type="button" class="btn btn-primary" onclick="postEmployees1('div_Loader', 1000)">
+                    1Save with AJAX
+                </button>
+            </div>
+        </form>
+        <div id="div_Loader" class="div_Loader" style="padding-left: 400px; top: 500px; display:none">
+            <img src="Loading.gif" width="100px" height="100px" alt="loader" />
+        </div>
+        <div id="output"> </div>
+    </div>
+    
+</div>
+
+<script type="text/javascript">
+
+    function hideStuff(id) {
+        let element = document.getElementById(id)
+        element.style.display = 'none';
+    }
+
+    function showStuff(id) {
+        let element = document.getElementById(id)
+        element.style.display = '';
+    }
+
+
+    function TimeDelay(timeToDelay) {
+        //sleep(5000);
+        setTimeout(function () {
+            console.log(' Delay in seconds  ' + timeToDelay);
+        }, 5000); //delay is in milliseconds
+        console.log(' Dentro de TimeDelay  ' + timeToDelay);
+        setInterval(
+            function () {
+                console.log(' dentro set interval  ' + timeToDelay);
+            },
+            5000
+        );
+        console.log(' Dentro de TimeDelay2  ' + timeToDelay);
+        console.log(Date.now());
+        sleep(10000);
+        console.log(Date.now());
+    }
+
+    function sleep(milliseconds) {
+        //www.sitepoint.com/delay-sleep-pause-wait/
+        const date = Date.now();
+        console.log(startTime());
+        let currentDate = null;
+        do {
+            currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+        console.log(startTime());
+    }
+
+    function checkTime(i) {
+        if (i < 10) {
+            i = "0" + i;
+        }
+        return i;
+    }
+
+    function startTime() {
+        //stackoverflow.com/questions/18229022/how-to-show-current-time-in-javascript-in-the-format-hhmmss
+        let today = new Date();
+        let h = today.getHours();
+        let m = today.getMinutes();
+        let s = today.getSeconds();
+        // add a zero in front of numbers<10
+        m = checkTime(m);
+        s = checkTime(s);
+        let tt = h + ":" + m + ":" + s;
+        return tt;
+        //t = setTimeout(function () {
+        //    startTime()
+        //}, 500);
+    }
+
+    function getEmployees(divLoader, milliseconds) {
+        $.ajax({
+            type: "GET",
+            url: 'AjaxEmployee/GetEmpList',
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                showStuff(divLoader); // Show loader icon
+            },
+            success: function (response) {
+                //console.log(response);
+                // Looping over emloyee list and display it
+                $.each(response, function (index, emp) {
+                    //console.log(emp.id + '  ' + emp.name);
+                    $('#output').append('<p>Id: ' + emp.id + '</p>' +
+                        '<p>Name: ' + emp.name + '</p>');
+                });
+            },
+            complete: function () {
+                sleep(milliseconds);
+                hideStuff(divLoader); // Hide loader icon
+            },
+            failure: function (jqXHR, textStatus, errorThrown) {
+                alert("HTTP Status: " + jqXHR.status + "; Error Text: " + jqXHR.responseText); // Display error message
+            }
+        });
+    }
+
+    //---------------------------------------------------------------
+    //---------------------------------------------------------------
+    //---------------------------------------------------------------
+
+    function Show() {
+        $('#div_Loader').show();
+    }
+
+    function Hide() {
+        $('#div_Loader').hide();
+    }
+
+    function postEmployees(divLoader, milliseconds) {
+        const results = new Array();
+
+        const emp1 = { "ID": "12", "Name": "Manas" };
+        results.push(emp1);
+
+        const emp2 = { "ID": "2", "Name": "Tester" };
+        results.push(emp2);
+
+        console.log(results);
+
+        // Without array you can use like to construct JSON object
+        // var results = { empList : [{ "ID": "1", "Name": "Manas" }, { "ID": "2", "Name": "Tester" }]};
+
+        let postData = { empList: results };
+        let postStringify = JSON.stringify(postData);
+
+        postData =  emp1;
+        postData = results;
+
+        $.ajax({
+            url: 'AjaxEmployee/SaveEmpList',
+            data: JSON.stringify(postData),
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            beforeSend: function () {
+                Show(); // Show loader icon
+            },
+            success: function (result) {
+                console.log(result);
+            },
+            complete: function () {
+                //sleep(milliseconds);
+                Hide(); // Hide loader icon
+            },
+            failure: function (jqXHR, textStatus, errorThrown) {
+                alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+
+
+    }
+
+
+    function postEmployees1(divLoader, milliseconds) {
+
+        let results = new Array();
+
+        let emp1 = { "ID": "12", "Name": "Manas" };
+        results.push(emp1);
+
+        let emp2 = { "ID": "2", "Name": "Tester" };
+        results.push(emp2);
+
+        // Without array you can use like to construct JSON object
+        // var results = { empList : [{ "ID": "1", "Name": "Manas" }, { "ID": "2", "Name": "Tester" }]};
+
+        let postData = { empList: results };
+
+        let parametro = "es una prueba";
+
+        $.ajax({
+
+            type: "POST",
+            url: 'AjaxEmployee/SaveEmpList1',
+            data: JSON.stringify(parametro),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                Show(); // Show loader icon
+            },
+            success: function (response) {
+                console.log(response);
+            },
+            complete: function () {
+                //sleep(milliseconds);
+                Hide(); // Hide loader icon
+            },
+            failure: function (jqXHR, textStatus, errorThrown) {
+                alert("HTTP Status: " + jqXHR.status + "; Error Text: " + jqXHR.responseText); // Display error message
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+
+
+    }
+</script>
