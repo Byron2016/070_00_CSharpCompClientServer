@@ -744,3 +744,267 @@
 					</script>
 				}
 			```
+
+5. FETCH:
+
+	- Sending a primitive param
+		- Add method to HomeController
+
+			```c#
+			using ClientServer.Web.Models;
+			using Microsoft.AspNetCore.Mvc;
+			using System.Diagnostics;
+
+			namespace ClientServer.Web.Controllers
+			{
+				public class HomeController : Controller
+				{
+					....
+					[HttpPost]
+					public JsonResult ToDoubleAjax([FromBody] int amountValue)
+					{
+						var amountDouble = amountValue * 2;
+
+						var result = new Result()
+						{
+							AmountDouble = amountDouble,
+							AmountValue = amountValue
+						};
+
+						return Json(result);
+					}
+				}
+			}
+			```
+
+		- Add javascript code to index view of HomeController
+
+			```javascript
+				@section scripts{
+					<script>
+						$(function (){
+							$("#btnDuplicarF").click(function () {
+								console.clear();
+								console.log("ejemplo 1 FLECH");
+								$("#spanDuplicado").html("");
+
+								const url = "@Url.Action("ToDoubleAjax","Home")";
+								const cantidad = $("#txtDuplicador").val();
+								const data = cantidad;
+
+								postData1(url, cantidad )
+									.then(data => {
+										console.log(data); // JSON data parsed by `data.json()` call
+										$("#spanDuplicado").html(data.amountDouble);
+									});
+
+							});
+
+							// Ejemplo implementando el metodo POST:
+							async function postData1(url = '', data = 0) {
+								console.log(data);
+								// Opciones por defecto estan marcadas con un *
+								const response = await fetch(url, {
+									method: 'POST', // *GET, POST, PUT, DELETE, etc.
+									mode: 'cors', // no-cors, *cors, same-origin
+									cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+									credentials: 'same-origin', // include, *same-origin, omit
+									headers: {
+										'Content-Type': 'application/json'
+										// 'Content-Type': 'application/x-www-form-urlencoded',
+									},
+									redirect: 'follow', // manual, *follow, error
+									referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+									body: JSON.stringify(data) // body data type must match "Content-Type" header
+								});
+								return response.json(); // parses JSON response into native JavaScript objects
+							}
+						
+						});
+					</script>
+				}
+			```
+
+	- Sending a complex param
+		- Add method to HomeController
+
+			```c#
+			using ClientServer.Web.Models;
+			using Microsoft.AspNetCore.Mvc;
+			using System.Diagnostics;
+
+			namespace ClientServer.Web.Controllers
+			{
+				public class HomeController : Controller
+				{
+					....
+
+					[HttpPost]
+					public JsonResult CreatePersonAjax([FromBody] Person people)
+					{
+						//FromBody: learn.microsoft.com/en-us/aspnet/web-api/overview/formats-and-model-binding/parameter-binding-in-aspnet-web-api
+						//Utilamos una clase base para todas nuestras comunicaciones para establecer un estandard
+						var result = new BaseResult();
+
+						try
+						{
+							if (people.Age < 18)
+							{
+								throw new ApplicationException("The person cannot be less than 18 years old");
+							}
+
+							//código para crear persona...
+							result.Mensaje = "person created successfully";
+							result.Ok = true;
+						}
+						catch (Exception ex)
+						{
+							result.Ok = false;
+							result.Mensaje = ex.Message;
+						}
+						return Json(result);
+					}
+				}
+			}
+			```
+
+		- Add javascript code to index view of HomeController
+
+			```javascript
+				@section scripts{
+					<script>
+						$(function (){
+							....
+							const btnCrearPersonaF = document.getElementById('btnCrearPersonaF');
+							btnCrearPersonaF.addEventListener('click', ExTwoFPost, false);
+
+							function ExTwoFPost() {
+								console.clear();
+								console.log("Example 2 fetch");
+								const url = '@Url.Action("CreatePersonAjax", "Home")';
+								const name = $("#txtNombre").val();
+								const age = $("#txtEdad").val();
+								const data = { Name: name, Age: age };
+
+								postData2(url, data)
+									.then(data => {
+										console.log("DONE - " + data.mensaje); // JSON data parsed by `data.json()` call
+									});
+
+							}
+
+							// Ejemplo implementando el metodo POST:
+							async function postData2(url = '', data = {}) {
+								console.log(data);
+								// Opciones por defecto estan marcadas con un *
+								const response = await fetch(url, {
+									method: 'POST', // *GET, POST, PUT, DELETE, etc.
+									mode: 'cors', // no-cors, *cors, same-origin
+									cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+									credentials: 'same-origin', // include, *same-origin, omit
+									headers: {
+										'Content-Type': 'application/json'
+										// 'Content-Type': 'application/x-www-form-urlencoded',
+									},
+									redirect: 'follow', // manual, *follow, error
+									referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+									body: JSON.stringify(data) // body data type must match "Content-Type" header
+								});
+								return response.json(); // parses JSON response into native JavaScript objects
+							}
+
+						});
+					</script>
+				}
+			```
+
+	- Returning a partial view
+		- Add method to HomeController
+
+			```c#
+			using ClientServer.Web.Models;
+			using Microsoft.AspNetCore.Mvc;
+			using System.Diagnostics;
+
+			namespace ClientServer.Web.Controllers
+			{
+				public class HomeController : Controller
+				{
+					....
+					[HttpGet]
+					public PartialViewResult AddPeopleListJ(string data, int valnum)
+					{
+						var valorPasado = data;
+						var person = new List<Person>()
+						{
+							new Person(){Name = "a", Age=2},
+							new Person(){Name = "a1", Age=19},
+							new Person(){Name = "a2", Age=53},
+						};
+
+						return PartialView("_PeopleList", person);
+					}
+					
+				}
+			}
+			```
+
+		- Add javascript code to index view of HomeController
+
+			```javascript
+				@section scripts{
+					<script>
+						$(function (){
+							....
+							const btnCargarF = document.getElementById('btnCargarF');
+							btnCargarF.addEventListener('click', ExTreeFPost, false);
+
+							function ExTreeFPost() {
+								console.clear();
+								console.log("Example 3 fetch");
+								let url = '@Url.Action("AddPeopleListJ", "Home")';
+								const data = { data: "param", valnum: 5 };
+
+								url = `${url}?data=${data.data}&valnum=${data.valnum}`;
+
+								$("#divGet").html("");
+
+								console.log("antes llamar a .get");
+
+								postData3(url, data)
+									.then(data => {
+										console.log("DONE " );
+										$("#divGet").append(data); // JSON data parsed by `data.json()` call
+									});
+
+								console.log("luego llamar a .get");
+							}
+
+							// Ejemplo implementando el metodo POST:
+							async function postData3(url = '', data = {}) {
+								console.log(data);
+								// Opciones por defecto estan marcadas con un *
+								//OJO: con GET no puede enviarse body.
+								const response = await fetch(url, {
+									method: 'GET', // *GET, POST, PUT, DELETE, etc.
+									mode: 'cors', // no-cors, *cors, same-origin
+									cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+									credentials: 'same-origin', // include, *same-origin, omit
+									headers: {
+										'Content-Type': 'application/json'
+										// 'Content-Type': 'application/x-www-form-urlencoded',
+									},
+									redirect: 'follow', // manual, *follow, error
+									referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+									//body: JSON.stringify(data) // body data type must match "Content-Type" header
+								});
+
+								console.log(response);
+								return response.text();
+								//return response.json(); // parses JSON response into native JavaScript objects
+							}
+							
+						});
+					</script>
+				}
+			```

@@ -27,7 +27,7 @@
     <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
         <div id="Ejemplo1">
-            <h1 class="display-6">Example 1: JQUERY - POST</h1>
+            <h1 class="display-6">Example 1: JQUERY/AJAX/FETCH - POST</h1>
 
             <form>
                 <div class="mb-3">
@@ -56,7 +56,7 @@
     <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab">
 
         <div id="Ejemplo2">
-            <h1 class="display-6">Example 2: JQUERY - POST (sending an object)</h1>
+            <h1 class="display-6">Example 2: JQUERY/AJAX/FETCH - POST (sending an object)</h1>
             <form>
                 <div class="mb-3">
                     <label for="txtNombre" class="form-label">Name</label>
@@ -81,7 +81,7 @@
     <div class="tab-pane" id="messages" role="tabpanel" aria-labelledby="messages-tab">
 
         <div id="Ejemplo3">
-            <h1 class="display-6">Example 3: JQUERY - GET (load a section of the page asynchronously)</h1>
+            <h1 class="display-6">Example 3: JQUERY/AJAX/FETCH - GET (load a section of the page asynchronously)</h1>
 
             <form>
                 <div class="mb-3">
@@ -217,6 +217,44 @@
                 })
             };
 
+            //Ejemplo1: Con FETCH
+            $("#btnDuplicarF").click(function () {
+                console.clear();
+                console.log("ejemplo 1 FLECH");
+                $("#spanDuplicado").html("");
+
+                const url = "@Url.Action("ToDoubleAjax","Home")";
+                const cantidad = $("#txtDuplicador").val();
+                const data = cantidad;
+
+                postData1(url, cantidad )
+                    .then(data => {
+                        console.log(data); // JSON data parsed by `data.json()` call
+                        $("#spanDuplicado").html(data.amountDouble);
+                    });
+
+            });
+
+            // Ejemplo implementando el metodo POST:
+            async function postData1(url = '', data = 0) {
+                console.log(data);
+                // Opciones por defecto estan marcadas con un *
+                const response = await fetch(url, {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+                return response.json(); // parses JSON response into native JavaScript objects
+            }
+
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             //Example 2:
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -285,6 +323,45 @@
                         console.log("ERROR - " + xhr.responseText);
                     }
                 })
+            }
+
+            //Ejemplo2: Con FETCH
+            const btnCrearPersonaF = document.getElementById('btnCrearPersonaF');
+            btnCrearPersonaF.addEventListener('click', ExTwoFPost, false);
+
+            function ExTwoFPost() {
+                console.clear();
+                console.log("Example 2 fetch");
+                const url = '@Url.Action("CreatePersonAjax", "Home")';
+                const name = $("#txtNombre").val();
+                const age = $("#txtEdad").val();
+                const data = { Name: name, Age: age };
+
+                postData2(url, data)
+                    .then(data => {
+                        console.log("DONE - " + data.mensaje); // JSON data parsed by `data.json()` call
+                    });
+
+            }
+
+            // Ejemplo implementando el metodo POST:
+            async function postData2(url = '', data = {}) {
+                console.log(data);
+                // Opciones por defecto estan marcadas con un *
+                const response = await fetch(url, {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+                return response.json(); // parses JSON response into native JavaScript objects
             }
 
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -365,6 +442,55 @@
                     }
                 });
 
+            }
+
+            //Ejemplo3: Con FETCH
+            const btnCargarF = document.getElementById('btnCargarF');
+            btnCargarF.addEventListener('click', ExTreeFPost, false);
+
+            function ExTreeFPost() {
+                console.clear();
+                console.log("Example 3 fetch");
+                let url = '@Url.Action("AddPeopleListJ", "Home")';
+                const data = { data: "param", valnum: 5 };
+
+                url = `${url}?data=${data.data}&valnum=${data.valnum}`;
+
+                $("#divGet").html("");
+
+                console.log("antes llamar a .get");
+
+                postData3(url, data)
+                    .then(data => {
+                        console.log("DONE " );
+                        $("#divGet").append(data); // JSON data parsed by `data.json()` call
+                    });
+
+                console.log("luego llamar a .get");
+            }
+
+            // Ejemplo implementando el metodo POST:
+            async function postData3(url = '', data = {}) {
+                console.log(data);
+                // Opciones por defecto estan marcadas con un *
+                //OJO: con GET no puede enviarse body.
+                const response = await fetch(url, {
+                    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    //body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+
+                console.log(response);
+                return response.text();
+                //return response.json(); // parses JSON response into native JavaScript objects
             }
 
         });
