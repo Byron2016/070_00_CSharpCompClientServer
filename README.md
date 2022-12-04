@@ -23,6 +23,19 @@
 ![JQuery](https://img.shields.io/static/v1?label=&message=jquery&color=blue&logo=sql&logoColor=white&style=for-the-badge)
 ![AJAX](https://img.shields.io/static/v1?label=&message=ajax&color=blue&logo=sql&logoColor=white&style=for-the-badge)
 ![FETCH](https://img.shields.io/static/v1?label=&message=Fetch&color=blue&logo=sql&logoColor=white&style=for-the-badge)
+
+## References
+
+- Ajax
+	- By Satya Karki
+		-  [How To Post Data In ASP.NET Using AJAX Without JSON Form Serializer](https://www.c-sharpcorner.com/article/how-to-post-data-in-asp-net-using-ajax-without-json-form-serializer/)
+		-  [How To Post Data In ASP.NET Core Using Ajax](https://www.c-sharpcorner.com/article/how-to-post-data-in-asp-net-core-using-ajax/)
+
+	- By Manas Mohapatra
+	    - [AJAX In ASP.NET](https://www.c-sharpcorner.com/article/ajax-in-asp-net/)
+
+	- By Desarrollo Web
+	    - [AJAX](https://desarrolloweb.com/home/ajax#track1)
 ## Steps
 
 1. Create these new projects with these caracteristics:
@@ -265,8 +278,6 @@
 
 									});
 							}
-
-
 						});
 					</script>
 				}
@@ -362,10 +373,6 @@
 									});
 
 							};
-
-
-
-
 						});
 					</script>
 				}
@@ -471,9 +478,268 @@
 
 								console.log("luego llamar a .get");
 							}
+						});
+					</script>
+				}
+			```
+4. AJAX:
 
+	- Sending a primitive param
+		<br></br>
+		**Satya Karki** shows two forms to call a **ajax** function depending if it is serealizated o no. 
 
+		- Add method to HomeController
 
+			```c#
+			using ClientServer.Web.Models;
+			using Microsoft.AspNetCore.Mvc;
+			using System.Diagnostics;
+
+			namespace ClientServer.Web.Controllers
+			{
+				public class HomeController : Controller
+				{
+					....
+					[HttpPost]
+					public JsonResult ToDoubleAjax([FromBody] int amountValue)
+					{
+						var amountDouble = amountValue * 2;
+
+						var result = new Result()
+						{
+							AmountDouble = amountDouble,
+							AmountValue = amountValue
+						};
+
+						return Json(result);
+					}
+				}
+			}
+			```
+
+		- Add javascript code to index view of HomeController
+
+			```javascript
+				@section scripts{
+					<script>
+						$(function (){
+							....
+							const btnDuplicarA = document.getElementById('btnDuplicarA');
+							btnDuplicarA.addEventListener("click", ExOneAPost, false);
+
+							function ExOneAPost() {
+								//Example 1: jQuery.post
+								//www.youtube.com/watch?v=6kgYrpugYJA
+								console.clear();
+								console.log("Example 1 ajax");
+								const url = '@Url.Action("ToDoubleAjax","Home")'
+								const amountValue = document.getElementById('txtDuplicador').value;
+								const data = amountValue;
+
+								$.ajax({
+									url: url,
+									data: data,
+									type: 'POST',
+									contentType: 'application/json; charset=utf-8',
+									beforeSend: function () {
+										console.log("ANTES");
+									},
+									success: function (result) {
+										console.clear();
+										console.log(result);
+										$("#spanDuplicado").html(result.amountDouble);
+									},
+									complete: function () {
+										console.log("COMPLETE");
+									},
+									failure: function (jqXHR, textStatus, errorThrown) {
+										//alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+									},
+									error: function () {
+										//alert('Failed to receive the Data');
+										console.log('Failed ');
+										console.log("ERROR - " + xhr.responseText);
+									}
+								})
+							};
+							
+						});
+					</script>
+				}
+			```
+
+	- Sending a complex param
+		- Add method to HomeController
+
+			```c#
+			using ClientServer.Web.Models;
+			using Microsoft.AspNetCore.Mvc;
+			using System.Diagnostics;
+
+			namespace ClientServer.Web.Controllers
+			{
+				public class HomeController : Controller
+				{
+					....
+
+					[HttpPost]
+					public JsonResult CreatePersonAjax([FromBody] Person people)
+					{
+						//FromBody: learn.microsoft.com/en-us/aspnet/web-api/overview/formats-and-model-binding/parameter-binding-in-aspnet-web-api
+						//Utilamos una clase base para todas nuestras comunicaciones para establecer un estandard
+						var result = new BaseResult();
+
+						try
+						{
+							if (people.Age < 18)
+							{
+								throw new ApplicationException("The person cannot be less than 18 years old");
+							}
+
+							//código para crear persona...
+							result.Mensaje = "person created successfully";
+							result.Ok = true;
+						}
+						catch (Exception ex)
+						{
+							result.Ok = false;
+							result.Mensaje = ex.Message;
+						}
+						return Json(result);
+					}
+				}
+			}
+			```
+
+		- Add javascript code to index view of HomeController
+
+			```javascript
+				@section scripts{
+					<script>
+						$(function (){
+							....
+							const btnCrearPersonaA = document.getElementById('btnCrearPersonaA');
+							btnCrearPersonaA.addEventListener('click', ExTwoAPost, false);
+
+							function ExTwoAPost() {
+								console.clear();
+								console.log("Example 2 ajax");
+								const url = '@Url.Action("CreatePersonAjax", "Home")';
+								const name = $("#txtNombre").val();
+								const age = $("#txtEdad").val();
+								const data = { Name: name, Age: age };
+
+								$.ajax({
+									url: url,
+									data: JSON.stringify(data),
+									type: 'POST',
+									contentType: 'application/json; charset=utf-8',
+									beforeSend: function () {
+										console.log("ANTES");
+									},
+									success: function (result) {
+										console.clear();
+										console.log("DONE - " + result.mensaje);
+									},
+									complete: function () {
+										console.log("COMPLETE");
+									},
+									failure: function (jqXHR, textStatus, errorThrown) {
+										//alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+									},
+									error: function () {
+										//alert('Failed to receive the Data');
+										console.log('Failed ');
+										console.log("ERROR - " + xhr.responseText);
+									}
+								})
+							}
+
+						});
+					</script>
+				}
+			```
+
+	- Returning a partial view
+		- Add method to HomeController
+
+			```c#
+			using ClientServer.Web.Models;
+			using Microsoft.AspNetCore.Mvc;
+			using System.Diagnostics;
+
+			namespace ClientServer.Web.Controllers
+			{
+				public class HomeController : Controller
+				{
+					....
+					[HttpGet]
+					public PartialViewResult AddPeopleListJ(string data, int valnum)
+					{
+						var valorPasado = data;
+						var person = new List<Person>()
+						{
+							new Person(){Name = "a", Age=2},
+							new Person(){Name = "a1", Age=19},
+							new Person(){Name = "a2", Age=53},
+						};
+
+						return PartialView("_PeopleList", person);
+					}
+					
+				}
+			}
+			```
+
+		- Add javascript code to index view of HomeController
+
+			```javascript
+				@section scripts{
+					<script>
+						$(function (){
+							....
+							const btnCargarA = document.getElementById('btnCargarA');
+							btnCargarA.addEventListener('click', ExTreeAPost, false);
+
+							function ExTreeAPost() {
+								console.clear();
+								console.log("Example 3 ajax");
+								const url = '@Url.Action("AddPeopleListJ", "Home")';
+
+								$("#divGet").html("");
+
+								console.log("antes llamar a .get");
+
+								let data = { data: "param", valnum: 5 };
+
+								$.ajax({
+									url: url,
+									data: data,
+									type: 'GET',
+									contentType: 'application/json',
+									dataType: 'text',
+									beforeSend: function () {
+										console.log("ANTES");
+									},
+									success: function (result) {
+										console.log("EXITO");
+										$("#divGet").append(result);
+									},
+									complete: function () {
+										console.log("COMPLETE");
+									},
+									failure: function (jqXHR, textStatus, errorThrown) {
+										//alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+									},
+									error: function (xhr) {
+										console.log("ERROR - " + xhr.responseText);
+										console.log(xhr);
+									}
+								});
+
+							}
+
+							
 						});
 					</script>
 				}

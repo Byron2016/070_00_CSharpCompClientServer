@@ -177,6 +177,46 @@
                     });
             };
 
+            //Ejemplo1: Con AJAX
+            const btnDuplicarA = document.getElementById('btnDuplicarA');
+            btnDuplicarA.addEventListener("click", ExOneAPost, false);
+
+            function ExOneAPost() {
+                //Example 1: jQuery.post
+                //www.youtube.com/watch?v=6kgYrpugYJA
+                console.clear();
+                console.log("Example 1 ajax");
+                const url = '@Url.Action("ToDoubleAjax","Home")'
+                const amountValue = document.getElementById('txtDuplicador').value;
+                const data = amountValue;
+
+                $.ajax({
+                    url: url,
+                    data: data,
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    beforeSend: function () {
+                        console.log("ANTES");
+                    },
+                    success: function (result) {
+                        console.clear();
+                        console.log(result);
+                        $("#spanDuplicado").html(result.amountDouble);
+                    },
+                    complete: function () {
+                        console.log("COMPLETE");
+                    },
+                    failure: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+                    },
+                    error: function () {
+                        //alert('Failed to receive the Data');
+                        console.log('Failed ');
+                        console.log("ERROR - " + xhr.responseText);
+                    }
+                })
+            };
+
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             //Example 2:
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -208,6 +248,44 @@
                     });
 
             };
+
+            //Ejemplo2: Con AJAX
+            const btnCrearPersonaA = document.getElementById('btnCrearPersonaA');
+            btnCrearPersonaA.addEventListener('click', ExTwoAPost, false);
+
+            function ExTwoAPost() {
+                console.clear();
+                console.log("Example 2 ajax");
+                const url = '@Url.Action("CreatePersonAjax", "Home")';
+                const name = $("#txtNombre").val();
+                const age = $("#txtEdad").val();
+                const data = { Name: name, Age: age };
+
+                $.ajax({
+                    url: url,
+                    data: JSON.stringify(data),
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    beforeSend: function () {
+                        console.log("ANTES");
+                    },
+                    success: function (result) {
+                        console.clear();
+                        console.log("DONE - " + result.mensaje);
+                    },
+                    complete: function () {
+                        console.log("COMPLETE");
+                    },
+                    failure: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+                    },
+                    error: function () {
+                        //alert('Failed to receive the Data');
+                        console.log('Failed ');
+                        console.log("ERROR - " + xhr.responseText);
+                    }
+                })
+            }
 
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             //Example 3:
@@ -245,6 +323,48 @@
                     });
 
                 console.log("luego llamar a .get");
+            }
+
+            //Ejemplo3: Con AJAX
+            const btnCargarA = document.getElementById('btnCargarA');
+            btnCargarA.addEventListener('click', ExTreeAPost, false);
+
+            function ExTreeAPost() {
+                console.clear();
+                console.log("Example 3 ajax");
+                const url = '@Url.Action("AddPeopleListJ", "Home")';
+
+                $("#divGet").html("");
+
+                console.log("antes llamar a .get");
+
+                let data = { data: "param", valnum: 5 };
+
+                $.ajax({
+                    url: url,
+                    data: data,
+                    type: 'GET',
+                    contentType: 'application/json',
+                    dataType: 'text',
+                    beforeSend: function () {
+                        console.log("ANTES");
+                    },
+                    success: function (result) {
+                        console.log("EXITO");
+                        $("#divGet").append(result);
+                    },
+                    complete: function () {
+                        console.log("COMPLETE");
+                    },
+                    failure: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Status: " + jqXHR.status + "; Error: " + jqXHR.responseText); // Display error message
+                    },
+                    error: function (xhr) {
+                        console.log("ERROR - " + xhr.responseText);
+                        console.log(xhr);
+                    }
+                });
+
             }
 
         });

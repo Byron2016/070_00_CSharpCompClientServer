@@ -47,6 +47,20 @@ namespace ClientServer.Web.Controllers
             return Json(result);
         }
 
+        [HttpPost]
+        public JsonResult ToDoubleAjax([FromBody] int amountValue)
+        {
+            var amountDouble = amountValue * 2;
+
+            var result = new Result()
+            {
+                AmountDouble = amountDouble,
+                AmountValue = amountValue
+            };
+
+            return Json(result);
+        }
+
         #endregion
 
         #region Example2
@@ -54,6 +68,32 @@ namespace ClientServer.Web.Controllers
         [HttpPost]
         public JsonResult CreatePersonJ(Person people)
         {
+            //Utilamos una clase base para todas nuestras comunicaciones para establecer un estandard
+            var result = new BaseResult();
+
+            try
+            {
+                if (people.Age < 18)
+                {
+                    throw new ApplicationException("The person cannot be less than 18 years old");
+                }
+
+                //código para crear persona...
+                result.Mensaje = "person created successfully";
+                result.Ok = true;
+            }
+            catch (Exception ex)
+            {
+                result.Ok = false;
+                result.Mensaje = ex.Message;
+            }
+            return Json(result);
+        }
+
+        [HttpPost]
+        public JsonResult CreatePersonAjax([FromBody] Person people)
+        {
+            //FromBody: learn.microsoft.com/en-us/aspnet/web-api/overview/formats-and-model-binding/parameter-binding-in-aspnet-web-api
             //Utilamos una clase base para todas nuestras comunicaciones para establecer un estandard
             var result = new BaseResult();
 
